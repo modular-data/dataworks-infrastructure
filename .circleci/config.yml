@@ -1,0 +1,50 @@
+version: 2.1
+
+orbs:
+  dataworks: modular-data/dataworks-orb@dev:latest
+
+workflows:
+  version: 2
+  
+  build-and-deploy:
+    jobs:
+      # Validate and plan for dev
+      - dataworks/terraform_validate_plan:
+          name: terraform-validate-plan-dev
+          environment: dev
+          code_path: "."
+          state_bucket: "dataworks-terraform-state"
+          dynamo_tab: "dataworks-terraform-state"
+          state_key: "dataworks-infrastructure"
+          region: eu-west-2
+          channel: dataworks-alerts
+          is_mock: false
+          filters:
+            branches:
+              only: /.*/
+
+      # Apply for dev (manual approval)
+      - hold-dev:
+          type: approval
+          requires:
+            - terraform-validate-plan-dev
+          filters:
+            branches:
+              only: main
+
+      - dataworks/terraform_proceed:
+          name: terraform-apply-dev
+          environment: dev
+          code_path: "."
+          state_bucket: "dataworks-terraform-state"
+          dynamo_tab: "dataworks-terraform-state"
+          state_key: "dataworks-infrastructure"
+          region: eu-west-2
+          channel: dataworks-alerts
+          notify_slack: true
+          apply_ready: true
+          requires:
+            - hold-dev
+          filters:
+            branches:
+              only: main

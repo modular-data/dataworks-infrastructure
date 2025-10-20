@@ -1,0 +1,142 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                 DATAWORKS INFRASTRUCTURE - COMMAND REFERENCE                 ║
+║                         Quick Reference Card                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SETUP (One-time)                                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  cd /Users/hari.chintala/dataworks-infrastructure
+  source ./scripts/setup-aws-credentials.sh
+  ./scripts/verify-setup.sh
+  make bootstrap-dev
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DAILY WORKFLOW                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. source ./scripts/setup-aws-credentials.sh   # Load credentials
+  2. make fmt                                     # Format code
+  3. make plan-dev                                # Plan changes
+  4. make apply-dev                               # Apply changes
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CREDENTIALS                                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Load:     source ./scripts/setup-aws-credentials.sh
+  Test:     aws sts get-caller-identity
+  Verify:   ./scripts/verify-setup.sh
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ BOOTSTRAP (Creates Backend)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Dev:      make bootstrap-dev
+  Test:     make bootstrap-test
+  Prod:     make bootstrap-prod
+  
+  Manual:   ./scripts/bootstrap-backend.sh <env>
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TERRAFORM                                                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Init:     make init-dev
+  Plan:     make plan-dev
+  Apply:    make apply-dev
+  
+  Format:   make fmt
+  Validate: make validate
+  Clean:    make clean
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ AWS COMMANDS                                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Account:  aws sts get-caller-identity
+  Buckets:  aws s3 ls
+  Keys:     aws kms list-keys
+  Tables:   aws dynamodb list-tables
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ VERIFICATION                                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Check setup:        ./scripts/verify-setup.sh
+  Check backend:      aws s3 ls s3://dataworks-terraform-state-dev
+  Check infrastructure: aws s3 ls | grep dataworks
+  Check state:        terraform state list
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Credentials not working:
+    → source ./scripts/setup-aws-credentials.sh
+    
+  Backend doesn't exist:
+    → make bootstrap-dev
+    
+  State locked:
+    → Wait for other user or terraform force-unlock <ID>
+    
+  Need to re-initialize:
+    → make clean && make init-dev
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ IMPORTANT REMINDERS                                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  ⚠️  ALWAYS source credentials in each new terminal:
+      source ./scripts/setup-aws-credentials.sh
+  
+  ⚠️  NEVER commit the credentials file
+  
+  ⚠️  Run verify-setup.sh before first use
+  
+  ⚠️  Review plan output before apply
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ YOUR CONFIGURATION                                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Account ID:    865517490483 (dev)
+  Region:        eu-west-2
+  Owner:         hari.chintala@isaggio.com
+  Project:       dataworks
+  
+  Backend:       s3://dataworks-terraform-state-dev
+  State Key:     project/dataworks-infrastructure
+  Lock Table:    dataworks-terraform-state-dev
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DOCUMENTATION                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Quick Start:       START_HERE.md
+  Usage Guide:       USAGE.md
+  Full Docs:         README.md
+  Architecture:      ARCHITECTURE.md
+  Credentials:       AWS_CREDENTIALS_SETUP.md
+  Account Info:      ACCOUNT_IDS.md
+  Checklist:         CHECKLIST.md
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ HELP                                                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Makefile help:     make help
+  Verify setup:      ./scripts/verify-setup.sh
+  Documentation:     See README.md and USAGE.md
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                      FIRST TIME? RUN THIS:                                   ║
+║                                                                              ║
+║  source ./scripts/setup-aws-credentials.sh                                  ║
+║  ./scripts/verify-setup.sh                                                  ║
+║  make bootstrap-dev                                                         ║
+║  make plan-dev                                                              ║
+║  make apply-dev                                                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
