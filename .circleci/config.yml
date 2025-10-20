@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  dataworks: modular-data/dataworks-orb@0.0.7
+  dataworks: modular-data/dataworks-orb@0.0.8
 
 workflows:
   version: 2
@@ -11,7 +11,7 @@ workflows:
       # Validate and plan for dev
       - dataworks/terraform_validate_plan:
           name: terraform-validate-plan-dev
-          environment: dev
+          environment: development
           code_path: "."
           state_bucket: "dataworks-terraform-state"
           dynamo_tab: "dataworks-terraform-state"
@@ -34,7 +34,7 @@ workflows:
 
       - dataworks/terraform_proceed:
           name: terraform-apply-dev
-          environment: dev
+          environment: development
           code_path: "."
           state_bucket: "dataworks-terraform-state"
           dynamo_tab: "dataworks-terraform-state"
