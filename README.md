@@ -201,4 +201,4 @@ All resources are tagged with:
 
 ## Support
 
-For issues or questions, contact: dataworks-team@digital.justice.gov.uk
+For issues or questions, contact: dataworks-team at Modular Data
