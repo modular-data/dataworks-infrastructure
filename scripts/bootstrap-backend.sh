@@ -25,8 +25,8 @@ if [ -z "$ENVIRONMENT" ]; then
     exit 1
 fi
 
-if [[ ! "$ENVIRONMENT" =~ ^(dev|test|prod)$ ]]; then
-    echo -e "${RED}Error: Invalid environment. Must be dev, test, or prod${NC}"
+if [[ ! "$ENVIRONMENT" =~ ^(development|test|prod)$ ]]; then
+    echo -e "${RED}Error: Invalid environment. Must be development, test, or prod${NC}"
     exit 1
 fi
 
@@ -55,6 +55,41 @@ if [ -z "$AWS_CLI" ]; then
     echo -e "${RED}aws cli not found in PATH or common locations; please install or add to PATH${NC}"
     exit 1
 fi
+
+# Verify AWS account ID
+echo -e "${YELLOW}Verifying AWS account...${NC}"
+CURRENT_ACCOUNT=$("$AWS_CLI" sts get-caller-identity --query Account --output text 2>/dev/null)
+
+if [ -z "$CURRENT_ACCOUNT" ]; then
+    echo -e "${RED}Error: Unable to get AWS account ID. Check your credentials.${NC}"
+    exit 1
+fi
+
+# Define expected account IDs per environment
+case "$ENVIRONMENT" in
+    development)
+        EXPECTED_ACCOUNT="865517490483"
+        ;;
+    test)
+        EXPECTED_ACCOUNT="TBD"  # Update when test account is known
+        ;;
+    prod)
+        EXPECTED_ACCOUNT="TBD"  # Update when prod account is known
+        ;;
+esac
+
+echo -e "Current AWS Account: ${CURRENT_ACCOUNT}"
+
+if [ "$EXPECTED_ACCOUNT" != "TBD" ] && [ "$CURRENT_ACCOUNT" != "$EXPECTED_ACCOUNT" ]; then
+    echo -e "${RED}Error: Account mismatch!${NC}"
+    echo -e "${RED}Expected: ${EXPECTED_ACCOUNT} (${ENVIRONMENT})${NC}"
+    echo -e "${RED}Current:  ${CURRENT_ACCOUNT}${NC}"
+    echo -e "${YELLOW}Please update scripts/setup-aws-credentials.sh with credentials for account ${EXPECTED_ACCOUNT}${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Account verified: ${CURRENT_ACCOUNT}${NC}"
+echo ""
 
 # Check if bucket already exists
 if "$AWS_CLI" s3 ls "s3://${BUCKET_NAME}" 2>&1 | grep -q 'NoSuchBucket'; then
